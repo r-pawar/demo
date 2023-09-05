@@ -1,17 +1,28 @@
-# TTS Backend Take Home Challenge
+As part of this task, following changes are made.
+1. The standalone application is converted into spring boot application.
+2. Following two endpoints are exposed
+   1. POST - /customers/{name}/rentals - create customer and add rentals
+   2. GET - /customers/{name}/rentals/statements - get statement for added rentals for customer
+3. Logging is added
+4. Unit and integration tests are added.
+5. The rental calculation from customer entity is refactored. Individual calculator calculating rent and reward points for each movie type is added. That way, adding new rule for another movie types will follow open-closed principle.
 
-Thank you for your interest in working at Taptap Send. If you are reading this then it means we are excited about you and want to know more about how you approach technical problems. This task is written in Java, but if you prefer to convert it to Kotlin (our backend language of choice) then feel free.
+Following assumptions are made while implementing rental calculator.
+1. Keeping the existing logic, Customer is uniquely identified by name. This is unrealistic in real world.
+2. A customer can have one rental request at a time. [One rental can have one or more rentals] Adding new rentals with same customer name will override existing records.
 
-This should take no more than 3 hours. Furthermore, we would like to see your work within 3 business days of receiving this challenge. Please let us know if that will be a problem. When you've completed the task, please send us a link to a Github repository with your work. Someone on our team will review within 1 business day and follow up with you about next steps.
+Improvements/changes that could be done.
+1. Instead of name, email address can be used to uniquely identify customer.
+2. Customer can have more than one rental request at a time. This can be done by removing rentals list from customer entity and add as one-many relationship. THen, rental request lifecycle can be managed separately.
+3. Database can be introduced for persistence storage.
 
-If you have any questions or need clarification, don't hesitate to ask. Good luck!
+Application can be simply started locally. Once application is started following command can be used to test endpoints.
+1. To create customer and add rentals
+```
+curl -X POST http://localhost:8080/customers/<name>/rentals -d '[{"movie":{"title":"Die Hard", "movieType":"CLASSIC"}, "daysRented":3}]' -H "content-type:application/json"
+```
 
-### Requirements
-
-You are writing code for a company that builds software to track and invoice for movie rentals and are asked to add a new billing rule for classic movies:
-
-- Renting a classic movie costs $1 per day, earns 1 reward point per day, and has no fixed rental cost.
-
-The codebase works in its current form, but was originally written by a junior engineer. Refactor the code as you see necessary and add the new billing rule. Make reasonable assumptions and document them.
-
-We will check that your code works, but are more interested in your approach to refactoring, code design, and the decisions you make. We will be asking you about the decisions you made in the next phase of the the interview so be prepared to speak to them.
+2. To get statement for the customer
+```
+curl -X GET http://localhost:8080/customers/<name>/rentals/statements
+```
